@@ -21,6 +21,8 @@ clickable = True
 end_game_lose = False
 end_game_win = False
 
+score = 0
+
 def create_rand_tile ():
 	counter = 0
 	for row in tiles:
@@ -56,6 +58,8 @@ def left (matrix):
 			if row[y] == row[y + 1] and row[y] and row[y + 1]:
 				matrix[x][y + 1] = 0
 				matrix[x][y] *= 2
+				global score
+				score += matrix[x][y]
 
 	clear_left()
 	return matrix
@@ -94,10 +98,11 @@ def down (matrix):
 
 
 def init_board ():
-	global tiles, clickable, end_game_win, end_game_lose
+	global tiles, clickable, end_game_win, end_game_lose, score
 	clickable = True
 	end_game_win = False
 	end_game_lose = False
+	score = 0
 
 	tiles = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
 	create_rand_tile()
@@ -113,28 +118,34 @@ def end_game(text):
 
 	alpha = Surface(window_size)
 	alpha.set_alpha(128)
-	alpha.fill((200, 200, 90))
+	alpha.fill((230, 230, 50))
 	window.blit(alpha, (0, 0))
 	
 	exit_button.draw()
 	again_button.draw()
 
-	text_rect = text.get_rect(center=(window_size[0] / 2, window_size[0] / 2))
+	score_text = font_object.render('Score is ' + str(score), True, (255, 255, 255))
+
+	text_rect = text.get_rect(center=(window_size[0] / 2, window_size[0] / 2 - 50))
+	score_rect = score_text.get_rect(center=(window_size[0] / 2, window_size[0] / 2 + 25))
 	window.blit(text, text_rect)
+	window.blit(score_text, score_rect)
 	display.update()
 
 def check_empty (board):
 	zero = 0
 
 	for row in board:
-		for tile in row:				
+		for tile in row:
 			if tile == 0: zero += 1
 
 	return not zero
 
 init_board()
 
-class Button:
+
+
+class GameButton:
 	def __init__ (self, pos: tuple, size: tuple, text: str):
 		self.event = event
 		self.text = text
@@ -154,8 +165,8 @@ class Button:
 while play:
 	window.blit(background, (0, 0))
 
-	exit_button = Button((window_size[0] / 2 - 100, window_size[0] / 2 + 100), (150, 50), "Keep going")
-	again_button = Button((window_size[0] / 2 + 100, window_size[0] / 2 + 100), (150, 50), "Try again")
+	exit_button = GameButton((window_size[0] / 2 - 100, window_size[0] / 2 + 100), (150, 50), "Keep going")
+	again_button = GameButton((window_size[0] / 2 + 100, window_size[0] / 2 + 100), (150, 50), "Try again")
 
 	for e in event.get():
 		if e.type == QUIT:
